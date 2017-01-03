@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 namespace DBChangesDataAPI.Models
 {
-    public class ToDoItemDBChanges
+    public class DBChanges
     {
         public int ID { get; set; }
         public string Description { get; set; }

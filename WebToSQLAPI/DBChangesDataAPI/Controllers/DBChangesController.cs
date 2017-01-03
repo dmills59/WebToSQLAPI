@@ -1,25 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
-using ToDoListDataAPI.Models;
+using DBChangesDataAPI.Models;
 using Microsoft.Azure;
 using Newtonsoft.Json;
 
 namespace DBChangesDataAPI.Controllers
 {
-    public class ToDoListController : ApiController
+    public class DBChangesController : ApiController
     {
         // Uncomment following lines for service principal authentication
         //private static string trustedCallerClientId = ConfigurationManager.AppSettings["todo:TrustedCallerClientId"];
         //private static string trustedCallerServicePrincipalId = ConfigurationManager.AppSettings["todo:TrustedCallerServicePrincipalId"];
 
-        private static Dictionary<int, ToDoItem> mockData = new Dictionary<int, ToDoItem>();
-        private static Dictionary<int, ToDoItem> sqlData = new Dictionary<int, ToDoItem>();
+        private static Dictionary<int, DBChanges> sqlData = new Dictionary<int, DBChanges>();
         private static string sqlDatabaseConnectionString = CloudConfigurationManager.GetSetting("sqlDatabaseConnectionString");
-        static ToDoListController()
+        static DBChangesController()
         {
-            //mockData.Add(0, new ToDoItem { ID = 0, Owner = "*", Description = "feed the dog" });
-            //mockData.Add(1, new ToDoItem { ID = 1, Owner = "*", Description = "take the dog on a walk" });
         }
 
         private static void CheckCallerId()
@@ -34,7 +31,7 @@ namespace DBChangesDataAPI.Controllers
         }
 
         // GET: api/ToDoItemList
-        public IEnumerable<ToDoItem> Get(string owner)
+        public IEnumerable<DBChanges> Get(string owner)
         {
             CheckCallerId();
 
@@ -50,24 +47,14 @@ namespace DBChangesDataAPI.Controllers
                 {
                     //string serialized = JsonConvert.SerializeObject(resultGroup);
 
-                    sqlData.Add(i++, new ToDoItem { ID = (int)resultGroup["ItemId"], Owner = (string)resultGroup["Owner"], Description = (string)resultGroup["Description"] });
+                    sqlData.Add(i++, new DBChanges { ID = (int)resultGroup["ItemId"], Owner = (string)resultGroup["Owner"], Description = (string)resultGroup["Description"] });
                 }
             }
             return sqlData.Values;
-            // return mockData.Values.Where(m => m.Owner == owner || owner == "*"); defunct
-        }
-
-        // GET: api/ToDoItemList/5
-        public ToDoItem GetById(string owner, int id)
-        {
-            CheckCallerId();
-
-            return mockData.Values.Where(m => (m.Owner == owner || owner == "*") && m.ID == id).First();
-            // Insert calls to SQLTextQuery to retreive data from SQL
         }
 
         // POST: api/ToDoItemList
-        public void Post(ToDoItem todo)
+        public void Post(DBChanges todo)
         {
             CheckCallerId();
             //We're using SQL CommandText Parameter.Add which needs a specially formatted list of fields for value substitution
@@ -86,12 +73,12 @@ namespace DBChangesDataAPI.Controllers
                 int i = 0;
                 foreach (var resultGroup in resultCollection)
                 {
-                    sqlData.Add(i++, new ToDoItem { ID = (int)resultGroup["ItemId"], Owner = (string)resultGroup["Owner"], Description = (string)resultGroup["Description"] });
+                    sqlData.Add(i++, new DBChanges { ID = (int)resultGroup["ItemId"], Owner = (string)resultGroup["Owner"], Description = (string)resultGroup["Description"] });
                 }
             }
         }
 
-        public void Put(ToDoItem todo)
+        public void Put(DBChanges todo)
         {
             CheckCallerId();
             if (todo != null)
@@ -101,7 +88,7 @@ namespace DBChangesDataAPI.Controllers
                 {
                     datafields += fieldname.Key + "=@" + fieldname.Key + ",";
                 }
-                //string updateDataQuery = " update todoitems set owner=@Owner,Description=@Description where ItemID=" + todo.ID;
+
                 string updateDataQuery = "update todoitems set " + datafields.TrimEnd(new char[] { ',' }) + " where ItemID=" + todo.ID; //TODO change the static ItemID to a @ parameter
                 SQL.SQLTextQuery queryPerformer = new SQL.SQLTextQuery(sqlDatabaseConnectionString);
                 IEnumerable<Dictionary<string, object>> resultCollection = queryPerformer.PerformQuery_new(updateDataQuery, todo.DBchanges);
@@ -112,7 +99,6 @@ namespace DBChangesDataAPI.Controllers
         public void Delete(string owner, int id)
         {
             CheckCallerId();
-            //string updateDataQuery = "DELETE FROM todoitems WHERE owner = N'" + owner + "' AND ItemID=N'" + id + "'";
             string updateDataQuery = "DELETE FROM todoitems WHERE owner = '" + owner + "' AND ItemID='" + id + "'";
             SQL.SQLTextQuery queryPerformer = new SQL.SQLTextQuery(sqlDatabaseConnectionString);
             IEnumerable<Dictionary<string, object>> resultCollection = queryPerformer.PerformQuery_new(updateDataQuery, null);
