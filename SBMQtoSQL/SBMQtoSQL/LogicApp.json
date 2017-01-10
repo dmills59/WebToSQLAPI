@@ -1,0 +1,107 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "logicAppName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "metadata": {
+        "description": "Name of the Logic App."
+      }
+    },
+    "logicAppLocation": {
+      "type": "string",
+      "defaultValue": "westus",
+      "allowedValues": [
+        "eastasia",
+        "southeastasia",
+        "centralus",
+        "eastus",
+        "eastus2",
+        "westus",
+        "northcentralus",
+        "southcentralus",
+        "northeurope",
+        "westeurope",
+        "japanwest",
+        "japaneast",
+        "brazilsouth",
+        "australiaeast",
+        "australiasoutheast",
+        "westcentralus",
+        "westus2",
+        "[resourceGroup().location]"
+      ],
+      "metadata": {
+        "description": "Location of the Logic App."
+      }
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "name": "[parameters('logicAppName')]",
+      "type": "Microsoft.Logic/workflows",
+      "location": "[parameters('logicAppLocation')]",
+      "tags": {
+        "displayName": "LogicApp"
+      },
+      "apiVersion": "2016-06-01",
+      "properties": {
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "actions": {
+            "HTTP": {
+              "type": "Http",
+              "inputs": {
+                "method": "POST",
+                "uri": "http://requestb.in/1mw27ee1",
+                "headers": "@triggerOutputs()['headers']",
+                "body": "@triggerBody()"
+              },
+              "runAfter": {}
+            }
+          },
+          "parameters": {},
+          "triggers": {
+            "HTTP_Webhook": {
+              "type": "HttpWebhook",
+              "inputs": {
+                "subscribe": {
+                  "method": "POST",
+                  "uri": "http://devpocazureservicebustrigger.azurewebsites.net/trigger/push/subscribe",
+                  "body": {
+                    "logicAppInfo": {
+                      "CallbackUrl": "@{listCallbackUrl()}",
+                      "Name": "@{workflow().name}",
+                      "workflowId": "@{workflow().id}"
+                    },
+                    "triggerConfig": {
+                      "QueueName": "devpoctodologicappqueue"
+                    }
+                  }
+                },
+                "unsubscribe": {
+                  "method": "POST",
+                  "uri": "http://devpocazureservicebustrigger.azurewebsites.net/trigger/push/unsubscribe",
+                  "body": {
+                    "logicAppInfo": {
+                      "CallbackUrl": "@{listCallbackUrl()}",
+                      "Name": "@{workflow().name}",
+                      "workflowId": "@{workflow().id}"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "contentVersion": "1.0.0.0",
+          "outputs": {}
+        },
+        "parameters": {}
+      }
+    }
+  ],
+  "outputs": {}
+}
