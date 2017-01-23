@@ -52,15 +52,36 @@
         "definition": {
           "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
           "actions": {
-            "HTTP": {
-              "type": "Http",
-              "inputs": {
-                "method": "POST",
-                "uri": "http://requestb.in/1mw27ee1",
-                "headers": "@triggerOutputs()['headers']",
-                "body": "@triggerBody()"
+            "Condition": {
+              "type": "If",
+              "expression": "@equals(triggerOutputs()['ContentData']['ItemID'], 101)",
+              "actions": {
+                "HTTP": {
+                  "type": "Http",
+                  "inputs": {
+                    "method": "POST",
+                    "uri": "http://requestb.in/1fs8mxk1",
+                    "headers": "@triggerOutputs()['headers']",
+                    "body": "@triggerBody()"
+                  },
+                  "runAfter": {}
+                }
               },
-              "runAfter": {}
+              "runAfter": {},
+              "else": {
+                "actions": {
+                  "HTTP_2": {
+                    "type": "Http",
+                    "inputs": {
+                      "method": "POST",
+                      "uri": "http://requestb.in/16i5u8l1",
+                      "headers": "@triggerOutputs()['headers']",
+                      "body": "@triggerBody()"
+                    },
+                    "runAfter": {}
+                  }
+                }
+              }
             }
           },
           "parameters": {},
@@ -70,7 +91,7 @@
               "inputs": {
                 "subscribe": {
                   "method": "POST",
-                  "uri": "http://devpocazureservicebustrigger.azurewebsites.net/trigger/push/subscribe",
+                  "uri": "http://azureservicebustriggerpoc.azurewebsites.net/trigger/push/subscribe",
                   "body": {
                     "logicAppInfo": {
                       "CallbackUrl": "@{listCallbackUrl()}",
@@ -84,7 +105,7 @@
                 },
                 "unsubscribe": {
                   "method": "POST",
-                  "uri": "http://devpocazureservicebustrigger.azurewebsites.net/trigger/push/unsubscribe",
+                  "uri": "http://azureservicebustriggerpoc.azurewebsites.net/trigger/push/unsubscribe",
                   "body": {
                     "logicAppInfo": {
                       "CallbackUrl": "@{listCallbackUrl()}",

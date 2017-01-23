@@ -4,9 +4,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
+using System.Runtime.Serialization;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace SBQueueMessenger
 {
+    [DataContract]
+    public class DataTransaction
+    {
+        [DataMember]
+        public int ItemID { get; set; }
+        [DataMember]
+        public string Description { get; set;}
+        [DataMember]
+        public string Owner { get; set; }
+        [DataMember]
+        public List<string> alist { get; set; }
+        //public List<KeyValuePair<string, string>> DBChanges { get; set; }
+
+    }
     class Program
     {
         static void Main(string[] args)
@@ -14,10 +31,27 @@ namespace SBQueueMessenger
             var connectionString = "Endpoint=sb://devpocservicebus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=e9rMeMcXGbsgZ4dX1oMSvwc6YLqnZAemJnKgj52l/mo=";
             var queueName = "devpoctodologicappqueue";
             var client = QueueClient.CreateFromConnectionString(connectionString, queueName);
- 
+
+            DataTransaction dtin = new DataTransaction()
+            {
+                ItemID = 101,
+                Description = "Create",
+                Owner = "Alan",
+                alist = new List<string> { "ItemID=122", "Owner = Alan", "Description=Shovel the sidewalk" }
+            };
+            var json = JsonConvert.SerializeObject(dtin);
+            var payloadstream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+            var msg = new BrokeredMessage(payloadstream,true);
+            msg.ContentType = "application/json";
+            client.Send(msg);
+
             //Send
-            var message = new BrokeredMessage("This is a test message from a Service Bus Message Queue!");
-            client.Send(message);
+            //String messagestr = "{\"ID\": 0, \"Description\": \"Create\",\"Owner\": \"Boss Hogs\",";
+            //messagestr += "\"DBchanges\": [{\"key\": \"ItemID\",\"value\": \"999\"},{\"key\": \"Owner\", \"value\": \"Steve Wisnewski\"}]}";
+            //var message = new BrokeredMessage(messagestr);
+            //var message = new BrokeredMessage("Create");
+            //var message = new BrokeredMessage(DateTime.Now.ToString() + ": This is a test message from a Service Bus Message Queue!");
+            //client.Send(message);
 
             //Receive
             /*client.OnMessage(message =>
@@ -27,7 +61,7 @@ namespace SBQueueMessenger
             });
 
             Console.ReadLine();
-    */    
-    }
+    */
+        }
     }
 }
