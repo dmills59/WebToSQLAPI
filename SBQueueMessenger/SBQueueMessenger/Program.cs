@@ -39,6 +39,7 @@ namespace SBQueueMessenger
                 Owner = "Alan",
                 alist = new List<string> { "ItemID=122", "Owner = Alan", "Description=Shovel the sidewalk" }
             };
+            //"ContentData":"{\"ItemID\":101,\"Description\":\"Create\",\"Owner\":\"Alan\",\"alist\":[\"ItemID=122\",\"Owner = Alan\",\"Description=Shovel the sidewalk\"]}"}
             var json = JsonConvert.SerializeObject(dtin);
             var payloadstream = new MemoryStream(Encoding.UTF8.GetBytes(json));
             var msg = new BrokeredMessage(payloadstream,true);

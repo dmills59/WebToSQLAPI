@@ -54,13 +54,13 @@
           "actions": {
             "Condition": {
               "type": "If",
-              "expression": "@equals(triggerOutputs()['ContentData']['ItemID'], 101)",
+              "expression": "@equals(json(triggerBody()['ContentData']).Description, 'Create')",
               "actions": {
                 "HTTP": {
                   "type": "Http",
                   "inputs": {
                     "method": "POST",
-                    "uri": "http://requestb.in/1fs8mxk1",
+                    "uri": "http://requestb.in/vbz1kuvb",
                     "headers": "@triggerOutputs()['headers']",
                     "body": "@triggerBody()"
                   },
@@ -74,7 +74,7 @@
                     "type": "Http",
                     "inputs": {
                       "method": "POST",
-                      "uri": "http://requestb.in/16i5u8l1",
+                      "uri": "http://requestb.in/vbz1kuvb",
                       "headers": "@triggerOutputs()['headers']",
                       "body": "@triggerBody()"
                     },
