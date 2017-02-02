@@ -3,6 +3,8 @@ using System.Linq;
 using System.Web.Http;
 using DBChangesDataAPI.Models;
 using Microsoft.Azure;
+using System.Diagnostics;
+using System;
 using Newtonsoft.Json;
 
 namespace DBChangesDataAPI.Controllers
@@ -60,21 +62,31 @@ namespace DBChangesDataAPI.Controllers
             //We're using SQL CommandText Parameter.Add which needs a specially formatted list of fields for value substitution
 
             string datafields = "@";
-            foreach (var fieldname in todo.DBchanges)
+            Trace.TraceInformation("TODO= ID:" + todo.ID + ", key[0]:" + todo.DBchanges[0].Key + ", value[0]" + todo.DBchanges[0].Value);
+            try
             {
-                datafields += fieldname.Key + ",@";
-            }
-            string insertDataQuery = "insert into dbo.todoitems values(" + datafields.TrimEnd(new char[] { ',', '@' }) + ")";
-            SQL.SQLTextQuery queryPerformer = new SQL.SQLTextQuery(sqlDatabaseConnectionString);
-            IEnumerable<Dictionary<string, object>> resultCollection = queryPerformer.PerformQuery_new(insertDataQuery, todo.DBchanges);
-
-            if (resultCollection != null && resultCollection.Any())
-            {
-                int i = 0;
-                foreach (var resultGroup in resultCollection)
+                foreach (var fieldname in todo.DBchanges)
                 {
-                    sqlData.Add(i++, new DBChanges { ID = (int)resultGroup["ItemId"], Owner = (string)resultGroup["Owner"], Description = (string)resultGroup["Description"] });
+                    datafields += fieldname.Key + ",@";
                 }
+                string insertDataQuery = "insert into dbo.todoitems values(" + datafields.TrimEnd(new char[] { ',', '@' }) + ")";
+                Trace.TraceInformation("Insert Query: " + insertDataQuery);
+
+                SQL.SQLTextQuery queryPerformer = new SQL.SQLTextQuery(sqlDatabaseConnectionString);
+                IEnumerable<Dictionary<string, object>> resultCollection = queryPerformer.PerformQuery_new(insertDataQuery, todo.DBchanges);
+
+                if (resultCollection != null && resultCollection.Any())
+                {
+                    int i = 0;
+                    foreach (var resultGroup in resultCollection)
+                    {
+                        sqlData.Add(i++, new DBChanges { ID = (int)resultGroup["ItemId"], Owner = (string)resultGroup["Owner"], Description = (string)resultGroup["Description"] });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Error occurred during POST:" + ex.ToString());
             }
         }
 

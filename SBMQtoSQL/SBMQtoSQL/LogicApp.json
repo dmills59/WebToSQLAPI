@@ -56,29 +56,96 @@
               "type": "If",
               "expression": "@equals(json(triggerBody()['ContentData']).Description, 'Create')",
               "actions": {
-                "HTTP": {
-                  "type": "Http",
-                  "inputs": {
-                    "method": "POST",
-                    "uri": "http://requestb.in/vbz1kuvb",
-                    "headers": "@triggerOutputs()['headers']",
-                    "body": "@triggerBody()"
+                "For_each": {
+                  "type": "Foreach",
+                  "foreach": "@json(triggerBody()['ContentData']).DBChanges",
+                  "actions": {
+                    "Compose": {
+                      "type": "Compose",
+                      "inputs": "@item()",
+                      "runAfter": {}
+                    }
                   },
                   "runAfter": {}
+                },
+                "DBChanges_Post": {
+                  "type": "Http",
+                  "inputs": {
+                    "method": "post",
+                    "body": {
+                      "ID": "@{json(triggerBody()['ContentData']).ItemID}",
+                      "Description": "@{json(triggerBody()['ContentData']).Description}",
+                      "Owner": "@{json(triggerBody()['ContentData']).Owner}",
+                      "DBchanges": [
+                        {
+                          "key": "@{json(triggerBody()['ContentData']).DBChanges[1].key}",
+                          "value": "@{json(triggerBody()['ContentData']).DBChanges[1].Value}"
+                        }
+                      ]
+                    },
+                    "uri": "http://api-webtosql.azurewebsites.net/api/DBChanges"
+                  },
+                  "runAfter": {},
+                  "metadata": {
+                    "apiDefinitionUrl": "http://api-webtosql.azurewebsites.net/swagger/docs/v1",
+                    "swaggerSource": "custom"
+                  }
                 }
               },
               "runAfter": {},
               "else": {
                 "actions": {
-                  "HTTP_2": {
-                    "type": "Http",
-                    "inputs": {
-                      "method": "POST",
-                      "uri": "http://requestb.in/vbz1kuvb",
-                      "headers": "@triggerOutputs()['headers']",
-                      "body": "@triggerBody()"
+                  "Condition_2": {
+                    "type": "If",
+                    "expression": "@equals(json(triggerBody()['ContentData']).Description, 'Update')",
+                    "actions": {
+                      "HTTP_2": {
+                        "type": "Http",
+                        "inputs": {
+                          "method": "POST",
+                          "uri": "http://requestb.in/p25jghp2",
+                          "headers": "@triggerOutputs()['headers']",
+                          "body": "@triggerBody()"
+                        },
+                        "runAfter": {}
+                      }
                     },
-                    "runAfter": {}
+                    "runAfter": {},
+                    "else": {
+                      "actions": {
+                        "Condition_3": {
+                          "type": "If",
+                          "expression": "@equals(json(triggerBody()['ContentData']).Description, 'Delete')",
+                          "actions": {
+                            "HTTP_3": {
+                              "type": "Http",
+                              "inputs": {
+                                "method": "POST",
+                                "uri": "http://requestb.in/p25jghp2",
+                                "headers": "@triggerOutputs()['headers']",
+                                "body": "@triggerBody()"
+                              },
+                              "runAfter": {}
+                            }
+                          },
+                          "runAfter": {},
+                          "else": {
+                            "actions": {
+                              "HTTP_4": {
+                                "type": "Http",
+                                "inputs": {
+                                  "method": "POST",
+                                  "uri": "http://requestb.in/p25jghp2",
+                                  "headers": "@triggerOutputs()['headers']",
+                                  "body": "@triggerBody()"
+                                },
+                                "runAfter": {}
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               }

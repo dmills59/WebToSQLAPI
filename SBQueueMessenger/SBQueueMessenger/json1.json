@@ -25,9 +25,7 @@
   "IsBodyConsumed": false,
   "ForcePersistence": false,
   "ContentData": "@string\b3http://schemas.microsoft.com/2003/10/Serialization/��{\"ID\": 0, \"Description\": \"Big Deal\",\"Owner\": \"Boss Hogs\",\"DBchanges\": [{\"key\": \"ItemID\",\"value\": \"999\"},{\"key\": \"Owner\", \"value\": \"Steve Wisnewski\"}]}"
-}
-
-{
+} {
   "CorrelationId": null,
   "SessionId": null,
   "ReplyToSessionId": null,
@@ -54,7 +52,15 @@
   "IsBodyConsumed": false,
   "ForcePersistence": false,
   "ContentData": "{\"ID\": 0, \"Description\": \"Create\",\"Owner\": \"Boss Hogs\"}"
-}
+} "ContentData":"@\u0006string\b3http://schemas.microsoft.com/2003/10/Serialization/�|{\"ItemID\":101,\"Description\":\"Create\",\"Owner\":\"Alan\",\"alist\":[\"ItemID=122\",\"Owner = Alan\",\"Description=Shovel the sidewalk\"]}"} "ContentData":"@\u000fBrokeredMessage\b;http://schemas.microsoft.com/netservices/2011/06/servicebus@\u0007Message�\u0003\u000b\u0000\u0000�\u0003\u0000\u0000\u0000�\u0003\u0001\u0000\u0001�! \u00005e1c7d4880ff40db939ee87d3081fba�\u00035\u001e\u0000�\t\u0000\u001f|\u0000\u0000\u0000\u0000\u0000\u0000�{\u0000{\"ItemID\":101,\"Description\":\"Create\",\"Owner\":\"Alan\",\"alist\":[\"ItemID=122\",\"Owner = Alan\",\"Description=Shovel the sidewalk\"�\u0002]}\u0001"}
 
-"ContentData":"@\u0006string\b3http://schemas.microsoft.com/2003/10/Serialization/�|{\"ItemID\":101,\"Description\":\"Create\",\"Owner\":\"Alan\",\"alist\":[\"ItemID=122\",\"Owner = Alan\",\"Description=Shovel the sidewalk\"]}"}
-"ContentData":"@\u000fBrokeredMessage\b;http://schemas.microsoft.com/netservices/2011/06/servicebus@\u0007Message�\u0003\u000b\u0000\u0000�\u0003\u0000\u0000\u0000�\u0003\u0001\u0000\u0001�! \u00005e1c7d4880ff40db939ee87d3081fba�\u00035\u001e\u0000�\t\u0000\u001f|\u0000\u0000\u0000\u0000\u0000\u0000�{\u0000{\"ItemID\":101,\"Description\":\"Create\",\"Owner\":\"Alan\",\"alist\":[\"ItemID=122\",\"Owner = Alan\",\"Description=Shovel the sidewalk\"�\u0002]}\u0001"}
+
+//Insert Query: insert into dbo.todoitems values(@[{"Key":"ItemID","Value":"101"},{"Key":"Description","Value":"Decript the message"},{"Key":"Owner","Value":"Samuel"}])
+
+//What it should look like
+//"{\"employees\":[{\"firstName\":\"John\", \"lastName\":\"Doe\"},{\"firstName\":\"Anna\", \"lastName\":\"Smith\"}, {\"firstName\":\"Peter\", \"lastName\":\"Jones\"}]}"
+
+//What it does look like (From the logic app run)
+
+//\"DBChanges\":[{\"Key\":\"ItemID\",\"Value\":\"101\"},{\"Key\":\"Description\",\"Value\":\"Decript the message\"},{\"Key\":\"Owner\",\"Value\":\"Samuel\"}]}"
+}

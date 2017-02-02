@@ -19,10 +19,10 @@ namespace SBQueueMessenger
         public string Description { get; set;}
         [DataMember]
         public string Owner { get; set; }
+        //[DataMember]
+        //public List<string> alist { get; set; }
         [DataMember]
-        public List<string> alist { get; set; }
-        //public List<KeyValuePair<string, string>> DBChanges { get; set; }
-
+        public List<KeyValuePair<string, string>> DBChanges { get; set; }
     }
     class Program
     {
@@ -37,9 +37,17 @@ namespace SBQueueMessenger
                 ItemID = 101,
                 Description = "Create",
                 Owner = "Alan",
-                alist = new List<string> { "ItemID=122", "Owner = Alan", "Description=Shovel the sidewalk" }
+                //alist = new List<string> { "ID=122", "Owner = Alan", "Description=Shovel the sidewalk" },
+                DBChanges = new List<KeyValuePair<string, string>>
+                {
+                    new KeyValuePair<string, string>("ItemID","101"),
+                    new KeyValuePair<string, string>("Description","Decript the message"),
+                    new KeyValuePair<string,string>("Owner","Samuel")
+                }
             };
-            //"ContentData":"{\"ItemID\":101,\"Description\":\"Create\",\"Owner\":\"Alan\",\"alist\":[\"ItemID=122\",\"Owner = Alan\",\"Description=Shovel the sidewalk\"]}"}
+
+            //"ContentData":"{\"ItemID\":101,\"Description\":\"Delete\",\"Owner\":\"Alan\",\"alist\":[\"ItemID=122\",\"Owner = Alan\",\"Description=Shovel the sidewalk\"]}"}
+            //"ContentData":"{\"ItemID\":101,\"Description\":\"Delete\",\"Owner\":\"Alan\",\"alist\":[\"ID=122\",\"Owner = Alan\",\"Description=Shovel the sidewalk\"],\"DBChanges\":[{\"Key\":\"ItemID\",\"Value\":\"101\"},{\"Key\":\"Description\",\"Value\":\"Decript the message\"},{\"Key\":\"Owner\",\"Value\":\"Samuel\"}]}"}
             var json = JsonConvert.SerializeObject(dtin);
             var payloadstream = new MemoryStream(Encoding.UTF8.GetBytes(json));
             var msg = new BrokeredMessage(payloadstream,true);
