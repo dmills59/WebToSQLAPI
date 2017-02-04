@@ -56,33 +56,11 @@
               "type": "If",
               "expression": "@equals(json(triggerBody()['ContentData']).Description, 'Create')",
               "actions": {
-                "For_each": {
-                  "type": "Foreach",
-                  "foreach": "@json(triggerBody()['ContentData']).DBChanges",
-                  "actions": {
-                    "Compose": {
-                      "type": "Compose",
-                      "inputs": "@item()",
-                      "runAfter": {}
-                    }
-                  },
-                  "runAfter": {}
-                },
                 "DBChanges_Post": {
                   "type": "Http",
                   "inputs": {
                     "method": "post",
-                    "body": {
-                      "ID": "@{json(triggerBody()['ContentData']).ItemID}",
-                      "Description": "@{json(triggerBody()['ContentData']).Description}",
-                      "Owner": "@{json(triggerBody()['ContentData']).Owner}",
-                      "DBchanges": [
-                        {
-                          "key": "@{json(triggerBody()['ContentData']).DBChanges[1].key}",
-                          "value": "@{json(triggerBody()['ContentData']).DBChanges[1].Value}"
-                        }
-                      ]
-                    },
+                    "body": "@json(triggerBody()['ContentData'])",
                     "uri": "http://api-webtosql.azurewebsites.net/api/DBChanges"
                   },
                   "runAfter": {},

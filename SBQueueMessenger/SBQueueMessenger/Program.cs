@@ -41,7 +41,7 @@ namespace SBQueueMessenger
                 DBChanges = new List<KeyValuePair<string, string>>
                 {
                     new KeyValuePair<string, string>("ItemID","101"),
-                    new KeyValuePair<string, string>("Description","Decript the message"),
+                    new KeyValuePair<string, string>("Description","Decrypt the message"),
                     new KeyValuePair<string,string>("Owner","Samuel")
                 }
             };

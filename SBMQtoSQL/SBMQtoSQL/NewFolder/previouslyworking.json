@@ -1,0 +1,144 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+  "actions": {
+    "Condition": {
+      "type": "If",
+      "expression": "@equals(json(triggerBody()['ContentData']).Description, 'Create')",
+      "actions": {
+        "For_each": {
+          "type": "Foreach",
+          "foreach": "@json(triggerBody()['ContentData']).DBChanges",
+          "actions": {
+            "Compose": {
+              "type": "Compose",
+              "inputs": "@item()",
+              "runAfter": {}
+            }
+          },
+          "runAfter": {}
+        },
+        "For_each1": {
+          "type": "Foreach",
+          "foreach": "@json(triggerBody()['ContentData']).DBChanges",
+          "actions": {
+            "DBChanges_Post": {
+              "type": "Http",
+              "inputs": {
+                "method": "post",
+                "body": {
+                  "ID": "@{json(triggerBody()['ContentData']).ItemID}",
+                  "Description": "@{json(triggerBody()['ContentData']).Description}",
+                  "Owner": "@{json(triggerBody()['ContentData']).Owner}",
+                  "DBchanges": [
+                    {
+                      "key": "@item()['key']",
+                      "value": "@item()['Value']"
+                    }
+                  ]
+                }, //body
+                "uri": "http://api-webtosql.azurewebsites.net/api/DBChanges"
+              }
+            }
+          },
+          "runAfter": {},
+          "metadata": {
+            "apiDefinitionUrl": "http://api-webtosql.azurewebsites.net/swagger/docs/v1",
+            "swaggerSource": "custom"
+          }
+        }
+      },
+      "runAfter": {},
+      "else": {
+        "actions": {
+          "Condition_2": {
+            "type": "If",
+            "expression": "@equals(json(triggerBody()['ContentData']).Description, 'Update')",
+            "actions": {
+              "HTTP_2": {
+                "type": "Http",
+                "inputs": {
+                  "method": "POST",
+                  "uri": "http://requestb.in/p25jghp2",
+                  "headers": "@triggerOutputs()['headers']",
+                  "body": "@triggerBody()"
+                },
+                "runAfter": {}
+              }
+            },
+            "runAfter": {},
+            "else": {
+              "actions": {
+                "Condition_3": {
+                  "type": "If",
+                  "expression": "@equals(json(triggerBody()['ContentData']).Description, 'Delete')",
+                  "actions": {
+                    "HTTP_3": {
+                      "type": "Http",
+                      "inputs": {
+                        "method": "POST",
+                        "uri": "http://requestb.in/p25jghp2",
+                        "headers": "@triggerOutputs()['headers']",
+                        "body": "@triggerBody()"
+                      },
+                      "runAfter": {}
+                    }
+                  },
+                  "runAfter": {},
+                  "else": {
+                    "actions": {
+                      "HTTP_4": {
+                        "type": "Http",
+                        "inputs": {
+                          "method": "POST",
+                          "uri": "http://requestb.in/p25jghp2",
+                          "headers": "@triggerOutputs()['headers']",
+                          "body": "@triggerBody()"
+                        },
+                        "runAfter": {}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "parameters": {},
+  "triggers": {
+    "HTTP_Webhook": {
+      "type": "HttpWebhook",
+      "inputs": {
+        "subscribe": {
+          "method": "POST",
+          "uri": "http://azureservicebustriggerpoc.azurewebsites.net/trigger/push/subscribe",
+          "body": {
+            "logicAppInfo": {
+              "CallbackUrl": "@{listCallbackUrl()}",
+              "Name": "@{workflow().name}",
+              "workflowId": "@{workflow().id}"
+            },
+            "triggerConfig": {
+              "QueueName": "devpoctodologicappqueue"
+            }
+          }
+        },
+        "unsubscribe": {
+          "method": "POST",
+          "uri": "http://azureservicebustriggerpoc.azurewebsites.net/trigger/push/unsubscribe",
+          "body": {
+            "logicAppInfo": {
+              "CallbackUrl": "@{listCallbackUrl()}",
+              "Name": "@{workflow().name}",
+              "workflowId": "@{workflow().id}"
+            }
+          }
+        }
+      }
+    }
+  },
+  "contentVersion": "1.0.0.0",
+  "outputs": {}
+}

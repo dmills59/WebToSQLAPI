@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
+using System.Diagnostics;
+using System;
 
 namespace DBChangesDataAPI.SQL
 {
@@ -104,6 +106,7 @@ namespace DBChangesDataAPI.SQL
             };
             command.CommandText = sqltext;
             //PrepareSqlCommand_new(command, new { a = 1, B = 2, c = 3 });
+            Trace.TraceInformation("CommandText: " + sqltext + "DBChanges" + dbchanges[0].Key + dbchanges[0].Value + "," + dbchanges[1].Key + dbchanges[1].Value);
             PrepareSqlCommand_new(command, dbchanges);
             return PerformQuery(command);
         }

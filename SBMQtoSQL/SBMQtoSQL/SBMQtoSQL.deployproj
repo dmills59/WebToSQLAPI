@@ -32,7 +32,8 @@
     <Content Include="Deploy-AzureResourceGroup.ps1" />
     <Content Include="LogicApp.json" />
     <Content Include="LogicApp.parameters.json" />
-    <None Include="NewFolder\notes.json" />
+    <None Include="NewFolder\previouslyworking.json" />
+    <None Include="NewFolder\previouslyworking2.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <Target Name="GetReferenceAssemblyPaths" />
